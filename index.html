@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>You Were the Model</title>
+<style>
+:root{--bg:#eef3f7;--ink:#14213d;--card:#fff;--line:#c5d2de;--hi:#ffc93c;--mut:#5b6b7e;--ml:#14213d;--mlt:#ffc93c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1826;--ink:#e8eef6;--card:#1a2638;--line:#2c3c55;--mut:#93a3b8;--ml:#2f4a75;--mlt:#ffc93c}}
+:root[data-theme="dark"]{--bg:#0f1826;--ink:#e8eef6;--card:#1a2638;--line:#2c3c55;--mut:#93a3b8;--ml:#2f4a75;--mlt:#ffc93c}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background-color:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;display:flex;align-items:center;justify-content:center}
+main{width:100%;max-width:1000px;padding:20px 16px}
+.kick{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+h1{font-size:clamp(1.6rem,4.6vw,3rem);line-height:1.1;margin:0 0 18px;letter-spacing:-.02em}
+h1 mark{background:var(--hi);color:#14213d;padding:0 .2em}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.steps button{font:inherit;cursor:pointer;color:var(--ink);background:var(--card);border:2px solid var(--ink);padding:10px 6px;text-align:center;font-weight:600;font-size:clamp(.75rem,1.8vw,1rem)}
+.steps button small{display:block;font-weight:400;color:var(--mut);font-size:.72rem}
+.steps button[aria-selected="true"]{background:var(--hi);color:#14213d}
+.steps button[aria-selected="true"] small{color:#14213d}
+button:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--ink);min-height:200px}
+.side{padding:18px 20px}
+.side h2{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+.side p{margin:0;font-size:clamp(1rem,2.4vw,1.45rem);line-height:1.35}
+.g{background:var(--card)}
+.g h2{color:var(--mut)}
+.m{background:var(--ml);color:#fff}
+.m h2{color:var(--mlt)}
+.m b{color:var(--mlt)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.end{margin:0;font-size:clamp(1rem,2.4vw,1.4rem);font-weight:700;opacity:0;transition:opacity .4s}
+.end.on{opacity:1}
+.nav button{font:inherit;font-weight:600;cursor:pointer;color:#14213d;background:var(--hi);border:2px solid var(--ink);padding:8px 16px}
+.hint{color:var(--mut);font-size:.8rem;margin:10px 0 0}
+@media (max-width:640px){.cmp{grid-template-columns:1fr}.steps{grid-template-columns:repeat(5,1fr);gap:4px}.steps small{display:none}}
+</style>
+</head>
+<body>
+<main>
+<p class="kick">What you just did</p>
+<h1>You ran a <mark>machine learning</mark> process</h1>
+<div class="steps" role="tablist" id="steps"></div>
+<div class="cmp" aria-live="polite">
+<div class="side g"><h2>In the game</h2><p id="g"></p></div>
+<div class="side m"><h2>In machine learning</h2><p id="m"></p></div>
+</div>
+<div class="foot">
+<p class="end" id="end">It wasn't a game about cards. You were the model.</p>
+<div class="nav"><button id="next">Next →</button></div>
+</div>
+<p class="hint">Click a step, or use the ← → arrow keys.</p>
+</main>
+<script>
+const S=[
+["Explore","Flip to look",
+ "Everything was face down. Your first flips were just to see what was there.",
+ "<b>Exploratory data analysis (EDA).</b> Look at the data before you build any model."],
+["Feedback","Wrong = +3 s",
+ "Every wrong pair cost you three seconds, so you flipped more carefully.",
+ "<b>Loss function.</b> A number that says how wrong you were. Training is guess, measure the loss, adjust."],
+["Trade-off","Learn or use?",
+ "Flip a new card to learn more, or use what you already remember to match a pair?",
+ "<b>Exploration vs exploitation.</b> The core dilemma of every reinforcement learning agent."],
+["Round code","New board",
+ "Memorize one layout and you fail on the next board. Understand the idea and you win on any board.",
+ "<b>Overfitting vs generalization.</b> Learn the idea, not the training data."],
+["Matching","Term ↔ meaning",
+ "You matched “eigenvector” with Av = λv.",
+ "<b>Learning associations.</b> Models like CLIP match images with text descriptions at huge scale."]
+];
+let cur=0;
+const bar=document.getElementById('steps');
+S.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('role','tab');
+ b.innerHTML=(i+1)+'. '+s[0]+'<small>'+s[1]+'</small>';b.onclick=()=>go(i);bar.appendChild(b)});
+function go(i){
+ cur=Math.max(0,Math.min(S.length-1,i));
+ [...bar.children].forEach((b,j)=>b.setAttribute('aria-selected',j===cur));
+ document.getElementById('g').textContent=S[cur][2];
+ document.getElementById('m').innerHTML=S[cur][3];
+ document.getElementById('end').classList.toggle('on',cur===S.length-1);
+ document.getElementById('next').textContent=cur===S.length-1?'Restart ↺':'Next →';
+}
+document.getElementById('next').onclick=()=>go(cur===S.length-1?0:cur+1);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+go(0);
+</script>
+</body>
+</html>
